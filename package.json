@@ -1,6 +1,6 @@
 {
   "name": "@jeffusion/tianshu",
-  "version": "0.1.0",
+  "version": "0.1.1",
   "type": "module",
   "scripts": {
     "dev": "node scripts/dev.mjs",
@@ -9,12 +9,12 @@
     "test": "node --test tests/context.test.mjs tests/deletion.test.mjs tests/protocol.test.mjs",
     "test:ledger": "python3 -m unittest discover -s tests -p 'test_*.py'",
     "typecheck": "tsc --noEmit",
-    "sync:local": "node scripts/sync-local.mjs",
     "demo": "node scripts/demo.mjs",
     "demo:prepare": "node scripts/demo.mjs --prepare-only",
     "demo:check": "node scripts/check-demo.mjs",
-    "prepack": "npm run build",
-    "test:package": "node --test tests/package.test.mjs"
+    "test:package": "node --test tests/package.test.mjs",
+    "test:native": "node scripts/test-native.mjs",
+    "pack:release": "npm run build && npm pack ./dist/package --ignore-scripts --pack-destination .local"
   },
   "overrides": {
     "zod": "$zod"
@@ -62,17 +62,9 @@
   "bin": {
     "tianshu": "bin/tianshu.mjs"
   },
-  "files": [
-    "bin/",
-    "cli/",
-    "dist/plugin/",
-    "dist/build-info.json",
-    "LICENSE",
-    "README.md",
-    "docs/npm-distribution.md"
-  ],
   "publishConfig": {
     "access": "public",
     "registry": "https://registry.npmjs.org/"
-  }
+  },
+  "private": true
 }

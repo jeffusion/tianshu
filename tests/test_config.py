@@ -1,11 +1,13 @@
 import json
+import os
+from unittest.mock import patch
 import subprocess
 import sys
 import tempfile
 import unittest
 from pathlib import Path
 sys.path.insert(0,str(Path(__file__).resolve().parents[1]/'ledger'))
-from config import load_config
+from config import load_config, config_path
 
 
 class ConfigTests(unittest.TestCase):
@@ -36,3 +38,31 @@ class ConfigTests(unittest.TestCase):
                 result=run('task-list',flag)
                 self.assertNotEqual(result.returncode,0)
                 self.assertIn('unrecognized arguments',result.stderr)
+
+    def test_stable_home_and_config_precedence(self):
+        with patch.dict(os.environ, {'TIANSHU_HOME':'/tmp/tianshu-fixture'}, clear=True):
+            self.assertEqual(config_path(),Path('/tmp/tianshu-fixture/config.json'))
+            with patch.dict(os.environ, {'TIANSHU_CONFIG':'/tmp/explicit.json'}):
+                self.assertEqual(config_path(),Path('/tmp/explicit.json'))
+                self.assertEqual(config_path('/tmp/argument.json'),Path('/tmp/argument.json'))
+        with patch.dict(os.environ, {'XDG_DATA_HOME':'/tmp/xdg'}, clear=True), patch('config.sys.platform','linux'):
+            self.assertEqual(config_path(),Path('/tmp/xdg/tianshu/config.json'))
+        with patch.dict(os.environ, {'TIANSHU_HOME':'relative'}, clear=True):
+            with self.assertRaises(ValueError):config_path()
+
+    def test_node_and_python_default_path_match_with_symlink_and_parent(self):
+        root=Path(__file__).resolve().parents[1]
+        with tempfile.TemporaryDirectory() as directory:
+            base=Path(directory)
+            (base/'target'/'nested').mkdir(parents=True)
+            (base/'link').symlink_to(base/'target'/'nested',target_is_directory=True)
+            home=str(base/'link'/'..'/'business')
+            with patch.dict(os.environ, {'TIANSHU_HOME':home}, clear=True):
+                expected=str(config_path())
+            script='const m=await import(process.argv[1]);console.log(m.configPath());'
+            environment=dict(os.environ,TIANSHU_HOME=home)
+            environment.pop('TIANSHU_CONFIG',None)
+            node=subprocess.run(['node','--input-type=module','-e',script,
+                                 (root/'src/contracts/config-path.mjs').as_uri()],
+                                env=environment,capture_output=True,text=True,check=True)
+            self.assertEqual(node.stdout.strip(),expected)

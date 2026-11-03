@@ -15,7 +15,27 @@
 - 删除任务保留独立验收归档；聊天空闲、回合结束和业务验收分别记录。
 - 明暗主题、只读浏览器预览、隔离测试与内容哈希构建标识。
 
-## 快速体验
+## npm 安装（正式渠道）
+
+```sh
+npm install -g @jeffusion/tianshu
+tianshu install
+tianshu doctor
+```
+
+命令安装后即可使用，无需克隆和构建源码；仍需本机 Node.js 24–26、Python 3.12+ 与 Codex CLI。npm 安装没有 postinstall 副作用，显式运行 install 才配置 Codex。安装后重开客户端、启用天枢并发送“@天枢 打开任务中心”。
+
+已有台账使用 `tianshu install --config /absolute/path/to/config.json`，不会搬动或清空数据。升级命令、回滚与卸载见 [npm 分发说明](docs/npm-distribution.md)。安装标识 `tianshu@tianshu`，市场显示名“天枢”，Skill 为 `tianshu:coordinator`，MCP 服务名 `tianshu`。
+
+源码克隆、npm ci、npm run demo 仅供开发测试。构建和测试不会更新当前 Codex 安装，也不会发布 npm 版本。
+
+## 工作方式与边界
+
+天枢提供 `open_workspace`、`list_tasks`、`get_task` 和 `delete_task`。工具本身不向其他聊天发消息；协调 Skill 使用宿主提供的聊天工具，按用户授权跟进工作。台账记录授权但不是权限系统，不能替代用户指令。
+
+删除仅接受已验收或已停止的任务，要求最新 revision、授权来源和必要的执行停止证据。删除不等于停止进程或监控。交付报告先进入待验收状态，经独立核验才接受。
+
+## 开发测试体验
 
 需要 Node.js 24 或 26、npm、Python 3.12+。Codex 插件宿主目前主要在 macOS 桌面客户端验证；CI 覆盖 Linux/macOS 的构建与隔离测试。
 
@@ -35,26 +55,7 @@ npm run check
 npm run build
 ```
 
-`check` 包含 TypeScript、生产构建、Node 协议测试和 Python 台账测试，无需 API key、模型服务或业务数据库。构建产物位于 `dist/plugin` 和 `dist/marketplace`，`dist/build-info.json` 包含内容指纹。版本保持 `0.1.0`；本地测试不递增版本，不自动生成 ZIP、创建 release 或发布 npm。
-
-## 安装到 Codex
-
-先按[配置说明](docs/configuration.md)指定自己的台账；安装需要本机 `codex` CLI。
-
-```sh
-npm run sync:local              # 只显示计划
-npm run sync:local -- --apply   # 明确执行本地安装
-```
-
-安装标识 `tianshu@tianshu`，市场显示名“天枢”，Skill 为 `tianshu:coordinator`，MCP 服务名 `tianshu`。安装后重开客户端、启用天枢并发送“@天枢 打开任务中心”。首次验证时可能需要将卡片展开到右侧。
-
-安装只通过官方 CLI 进行。当前桌面格式及路径处理见[兼容性说明](docs/compatibility.md)。构建与测试不会自动更新 Codex。
-
-## 工作方式与边界
-
-天枢提供 `open_workspace`、`list_tasks`、`get_task` 和 `delete_task`。工具本身不向其他聊天发消息；协调 Skill 使用宿主提供的聊天工具，按用户授权跟进工作。台账记录授权但不是权限系统，不能替代用户指令。
-
-删除仅接受已验收或已停止的任务，要求最新 revision、授权来源和必要的执行停止证据。删除不等于停止进程或监控。交付报告先进入待验收状态，经独立核验才接受。
+`check` 包含 TypeScript、生产构建、Node 协议测试、Python 台账测试和真实 npm 包生命周期测试，无需 API key、模型服务或业务数据库。构建产物位于 `dist/plugin` 和 `dist/marketplace`，`dist/build-info.json` 包含内容指纹。版本保持 `0.1.0`；本地测试不递增版本，不自动生成 ZIP、创建 release 或发布 npm。
 
 ## 工程结构
 

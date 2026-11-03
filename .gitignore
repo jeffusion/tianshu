@@ -16,3 +16,7 @@ __pycache__/
 /docs/acceptance/
 /docs/decisions/
 /scripts/verify-preservation.mjs
+
+# Local registry credentials must never be committed.
+.npmrc
+*.tgz

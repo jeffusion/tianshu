@@ -5,6 +5,7 @@ import {join} from 'node:path';
 import {createHash} from 'node:crypto';
 import {product} from '../src/contracts/product.mjs';
 import {buildIdentity} from './metadata.mjs';
+import {notices} from './notices.mjs';
 const identity=buildIdentity();
 const root='dist/plugin';
 rmSync('dist',{recursive:true,force:true});mkdirSync(root,{recursive:true});
@@ -20,6 +21,7 @@ json(join(root,'.codex-plugin/plugin.json'),{name:product.id,version:product.ver
 const command={command:'node',args:['${PLUGIN_ROOT}/dist/server.mjs']};
 json(join(root,'.mcp.json'),{mcpServers:{[product.id]:command}});
 json(join(root,'build-info.json'),identity);
+notices(join(root,'THIRD_PARTY_NOTICES.txt'));
 const files={};
 const walk=dir=>{for(const e of readdirSync(dir,{withFileTypes:true})){const p=join(dir,e.name);if(e.isDirectory())walk(p);else files[p.slice(root.length+1)]=createHash('sha256').update(readFileSync(p)).digest('hex');}};
 walk(root);json('dist/build-info.json',{...identity,files});

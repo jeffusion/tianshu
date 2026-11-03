@@ -1,0 +1,48 @@
+name: Publish npm
+
+on:
+  workflow_dispatch:
+    inputs:
+      version:
+        description: 'Exact version in package.json (for example 0.1.0)'
+        required: true
+        type: string
+
+permissions:
+  contents: read
+
+concurrency:
+  group: publish-npm
+  cancel-in-progress: false
+
+jobs:
+  publish:
+    if: github.ref == 'refs/heads/main'
+    runs-on: ubuntu-latest
+    timeout-minutes: 20
+    environment: npm
+    permissions:
+      contents: read
+      id-token: write
+    steps:
+      - uses: actions/checkout@d23441a48e516b6c34aea4fa41551a30e30af803 # v6
+        with:
+          persist-credentials: false
+      - uses: actions/setup-node@249970729cb0ef3589644e2896645e5dc5ba9c38 # v6
+        with:
+          node-version: '24'
+          cache: npm
+      - uses: actions/setup-python@ece7cb06caefa5fff74198d8649806c4678c61a1 # v6
+        with:
+          python-version: '3.12'
+      - name: Verify release identity
+        env:
+          RELEASE_VERSION: ${{ inputs.version }}
+        run: node scripts/verify-release.mjs
+      - run: npm ci
+      - run: npm run check
+      - name: Publish to npmjs using trusted identity
+        run: |
+          mkdir -p .local/publish
+          npm pack --ignore-scripts --pack-destination .local/publish
+          npm publish .local/publish/*.tgz --access public --provenance --ignore-scripts

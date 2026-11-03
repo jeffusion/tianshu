@@ -4,7 +4,7 @@ on:
   workflow_dispatch:
     inputs:
       version:
-        description: 'Exact version in package.json (for example 0.1.0)'
+        description: 'Exact version in package.json (for example 0.1.1)'
         required: true
         type: string
 
@@ -44,5 +44,5 @@ jobs:
       - name: Publish to npmjs using trusted identity
         run: |
           mkdir -p .local/publish
-          npm pack --ignore-scripts --pack-destination .local/publish
+          npm pack ./dist/package --ignore-scripts --pack-destination .local/publish
           npm publish .local/publish/*.tgz --access public --provenance --ignore-scripts

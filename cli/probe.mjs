@@ -32,6 +32,6 @@ export function probe(server,python,config){
         }catch(error){finish(error);}
       }
     });
-    send({jsonrpc:'2.0',id:1,method:'initialize',params:{protocolVersion:'2025-03-26',capabilities:{},clientInfo:{name:'tianshu-doctor',version:'0.1.0'}}});
+    send({jsonrpc:'2.0',id:1,method:'initialize',params:{protocolVersion:'2025-03-26',capabilities:{},clientInfo:{name:'tianshu-doctor',version:'1'}}});
   });
 }

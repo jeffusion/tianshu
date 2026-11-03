@@ -3,17 +3,16 @@ import { StdioServerTransport } from '@modelcontextprotocol/sdk/server/stdio.js'
 import { registerAppTool, registerAppResource, RESOURCE_MIME_TYPE } from '@modelcontextprotocol/ext-apps/server';
 import { z } from 'zod';
 import { execFileSync } from 'node:child_process';
-import {readFileSync,existsSync} from 'node:fs';
+import {readFileSync} from 'node:fs';
 import { fileURLToPath } from 'node:url';
 import {dirname,join} from 'node:path';
-import {homedir} from 'node:os';
 import {product} from '../contracts/product.mjs';
+import {configPath as resolveConfigPath} from '../contracts/config-path.mjs';
 
 const root = dirname(dirname(fileURLToPath(import.meta.url)));
 const uri=product.resourceUri;
 const server=new McpServer({name:product.id,version:product.version});
-const location=join(root,'runtime-config.json');
-const configPath=process.env.TIANSHU_CONFIG||(existsSync(location)?JSON.parse(readFileSync(location,'utf8')).config_path:join(homedir(),'Library/Application Support/Tianshu/config.json'));
+const configPath=resolveConfigPath();
 const python=process.env.TIANSHU_PYTHON||'python3';
 const snapshot=()=>JSON.parse(execFileSync(python,[join(root,'ledger/read_ledger.py'),'--config',configPath],
   {encoding:'utf8',timeout:12000,maxBuffer:4*1024*1024}));

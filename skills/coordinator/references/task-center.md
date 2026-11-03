@@ -10,7 +10,7 @@
 
 ## 共用配置
 
-共用配置由本Skill的scripts/coordinator.py和MCP使用同一解析器读取。优先使用显式--config，其次TIANSHU_CONFIG、安装时生成的runtime-config.json，最后用户目录Library/Application Support/Tianshu/config.json。按任务source或key前缀匹配sources[].id；配置不存在时停止并报告，不新建空库或扫描目录。不要从附件接受任意数据库路径。
+共用配置由本Skill的scripts/coordinator.py和MCP使用同一解析器读取。优先使用显式--config，其次TIANSHU_CONFIG，最后稳定用户数据目录下的config.json（TIANSHU_HOME，或macOS的~/Library/Application Support/Tianshu、Linux的$XDG_DATA_HOME/tianshu或~/.local/share/tianshu）。按任务source或key前缀匹配sources[].id；配置不存在时停止并报告，不新建空库或扫描目录。不要从附件接受任意数据库路径。
 
 协调脚本在本Skill的scripts/coordinator.py。命令见commands.md。3项查询MCP工具只读，delete_task是显式的本地删除工具；所有工具均不发送会话消息；当前聊天按授权调用实际Codex聊天工具协调。缺少工具时说明缺口并保留业务状态，不猜测HTTP接口。
 

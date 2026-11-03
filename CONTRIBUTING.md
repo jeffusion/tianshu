@@ -10,4 +10,4 @@
 
 不要提交真实任务、聊天正文、数据库、个人配置、API key、本机路径、dist 或 node_modules。不要用跳过断言代替修复，不在 CI 自动安装到 Codex或访问模型服务。涉及 Skill 的变更必须保留用户授权、可靠派发和独立验收语义。
 
-提交示例：`fix(ledger): preserve deletion receipt on retry`。版本维持0.1.0，日常 PR 不递增版本。贡献遵循 [MIT 许可证](LICENSE)；提交 PR 即表示你有权以此许可证贡献所含内容。
+提交示例：`fix(ledger): preserve deletion receipt on retry`。日常 PR 不递增版本；正式发布按 npm 不可覆盖规则选择新版本。贡献遵循 [MIT 许可证](LICENSE)；提交 PR 即表示你有权以此许可证贡献所含内容。

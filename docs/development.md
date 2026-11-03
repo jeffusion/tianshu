@@ -7,9 +7,11 @@
 - `npm run demo`：隔离演示数据和浏览器预览。
 - `npm run demo:prepare`、`npm run demo:check`：准备演示并断言只读投影、来源健康及预期任务存在。
 - `npm run dev`：读取自己的开发配置；预览服务只监听本机 8975。
-- `npm run check`：类型检查、生产构建、Node、Python 和实际 npm 包生命周期测试。
-- `npm run build`：生成桌面插件与本地市场，不安装。
-- `npm run sync:local`：查看安装计划；只有 `--apply` 执行安装。
+- `npm run check`：类型检查、生产构建、Node、Python 和实际 npm tarball 测试。
+- `npm run build`：生成 dist/package 标准插件包，不安装。
+- `npm run test:native -- --local`：真实 Codex 临时本地安装与宿主工具加载验收。
+- `npm run test:native`：发布后从 npmjs 进行真实 Codex 隔离安装验收。
+- `npm run pack:release`：构建并将 npm tarball 写入 .local，不发布。
 
 ## GitHub Flow
 
@@ -27,4 +29,6 @@ CI 在 PR、main push 和手动触发时运行 Linux/macOS、Node 24/26 的矩�
 
 ## npm 分发
 
-正式安装以 `@jeffusion/tianshu` npm 包为入口；源码安装仅用于开发测试。`npm run build` 不发布，`npm pack` 在维护者环境构建。包白名单只包含命令、已构建插件、校验清单、许可证和安装说明，不含开发依赖或业务数据。生命周期回归真实安装 npm 包，并使用隔离 Codex fixture；参考 [npm 分发说明](npm-distribution.md)。
+正式发布物是 `@jeffusion/tianshu`，用户经 Codex 原生命令安装；源码安装仅用于开发测试。工程根 package.json 为 private，运行包由 build 写入 dist/package，移除开发依赖与 npm 脚本。根级 .codex-plugin/plugin.json、.mcp.json、skills/ 和运行文件一起打入 tarball。发布工作流明确打包 dist/package，避免误发开发工程。
+
+常规 CI 不安装 Codex，不伪造宿主结果。实际 npm 包测试使用真实 npm 和 SDK；额外的 test:native 使用真实 Codex CLI 与 app-server，所有配置和台账均在临时目录，结束后清理。参考 [npm 分发说明](npm-distribution.md)。

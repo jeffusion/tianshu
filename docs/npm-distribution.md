@@ -1,73 +1,56 @@
-# npm 安装、升级与发布
-
-正式渠道是 npmjs：`@jeffusion/tianshu`。命令为 `tianshu`，Codex 插件为 `tianshu@tianshu`。源码安装只用于开发测试。
+# npm 分发与 Codex 原生安装
 
 ## 安装
 
-要求 Node.js 24–26、Python 3.12+、已安装并可运行的 Codex CLI。npm 包内已包含运行文件，无需克隆仓库、编译界面或下载额外安装包；Python 台账核心仍使用本机 Python。暂不支持 Windows 安装。
+插件是 npmjs 上的 `@jeffusion/tianshu`。GitHub 只承载市场目录；Codex 根据目录直接获取 npm 包，不要求用户安装独立 CLI 或构建源码。
 
 ```sh
-npm install -g @jeffusion/tianshu
-tianshu install
-tianshu doctor
+codex plugin marketplace add jeffusion/tianshu
+codex plugin add tianshu@jeffusion
 ```
 
-也可以 `npx --yes @jeffusion/tianshu install`。npm 安装本身不修改 Codex；显式运行 `install` 才初始化默认台账并安装插件。之后重开 Codex、启用“天枢”、发送“@天枢 打开任务中心”，必要时将卡片展开到右侧。doctor 检查运行时和只读数据查询，不代表宿主页面和附件已经验收。
+要求 Node.js 24–26、npm、Python 3.12+ 与支持 npm 插件源的 Codex。当前验证范围是 macOS 桌面和 Linux/macOS 自动测试，Windows 尚未验收。npm 包不含安装脚本；插件生命周期由 Codex 管理。
 
-如果已有任务，明确指定既有配置，避免创建另一份空台账：
+首次使用显式初始化业务台账，再检查本包的 MCP 和只读查询：
 
 ```sh
-tianshu install --config /absolute/path/to/existing-config.json
+npx --yes @jeffusion/tianshu@0.1.1 init
+npx --yes @jeffusion/tianshu@0.1.1 doctor
 ```
 
-自定义配置必须已经存在、来源可读，且数据库版本受支持。工具不迁移、替换或清空既有数据库，不从历史工程目录自动寻找任务。
+已有配置只校验、不覆盖；指定不存在的 `--config` 会报错。doctor 检查当前 npm 包，不声称检查了 Codex 已安装版本或实际页面。重开 Codex、启用“天枢”、发送“@天枢 打开任务中心”，必要时展开到右侧。
 
-## 稳定存储
+## 业务数据
 
-macOS 默认使用 `~/Library/Application Support/Tianshu`；Linux 默认使用 `$XDG_DATA_HOME/tianshu` 或 `~/.local/share/tianshu`。可通过 `TIANSHU_HOME` 指定独立目录。
+配置与台账在插件缓存之外。macOS 默认 `~/Library/Application Support/Tianshu`，Linux 默认 `$XDG_DATA_HOME/tianshu` 或 `~/.local/share/tianshu`；支持 `TIANSHU_HOME`。其中只有 `config.json` 与 `data/`，没有插件版本副本、安装状态或回滚日志。
 
-- `config.json`、`data/`：默认配置和台账。
-- `releases/`：已校验的插件运行文件，用于回滚。
-- `marketplace/`：稳定的本地市场入口，不依赖 npm 全局安装目录、npx 缓存或源码目录。
-- `installation.json`：当前/上一份插件及配置路径。
-- `operation.json`：未完成操作的恢复记录；正常完成后移除。
-- `lifecycle.lock`：由操作系统释放的进程锁，防止并发改写安装。
+已有台账在默认 `config.json` 中填入原配置的 `sources` 与可选 `presentation_path`，保持数据库和证据的绝对路径；已有默认配置不要覆盖。也可以通过 `TIANSHU_CONFIG` 指定既有配置，但要确保启动 Codex 的环境和命令行相同。详见[配置说明](configuration.md)。插件查询缺失配置会报错，不自动建库。
 
-`CODEX_HOME` 控制目标 Codex 配置；同一 TIANSHU_HOME 绑定一个 CODEX_HOME。`TIANSHU_PYTHON`、`TIANSHU_CODEX` 可显式指定可执行文件。MCP 启动路径在用户机器上生成，不写回 npm 包。
-
-## 升级与回滚
+## 升级与卸载
 
 ```sh
-npm install -g @jeffusion/tianshu@latest
-tianshu upgrade
-tianshu doctor
-# 如需恢复上一份已管理的运行文件：
-tianshu rollback
+codex plugin marketplace upgrade jeffusion
+codex plugin add tianshu@jeffusion
+# 卸载插件；业务台账和验收记录保留
+codex plugin remove tianshu@jeffusion
+# 不再需要这个市场时
+codex plugin marketplace remove jeffusion
 ```
 
-npm 升级只替换命令；`upgrade` 才更新 Codex 插件。上一份文件保留在稳定目录，回滚不依赖重新下载 npm 包，也不回滚数据库。首次安装没有上一份 npm 管理的插件时会明确报错。首次接入旧开发版会保留原市场路径回执，原源码/数据保持原位。
+市场将每次发行固定到明确的 npm 版本；刷新目录后使用 Codex 原生命令安装。版本选择和缓存由 Codex 负责；天枢不提供独立升级、回滚或卸载命令，也不自动清除数据。
 
-安装先验证文件清单和 SHA-256、检查配置、运行 MCP 健康查询，再通过官方 Codex CLI 注册。注册/安装/健康检查失败时尝试恢复之前的插件；恢复不能完成时保留操作记录，运行 `tianshu rollback` 重试恢复。不要手工清空数据目录来掩盖故障。
+## 从旧的本地安装切换
 
-## 卸载
+`0.1.0` 曾附带独立安装管理，已经移除。先保留既有 config.json、数据库和证据，再用 Codex 移除旧入口 `tianshu@tianshu` 与市场 `tianshu`（仅在该旧入口确实存在时），随后按上面的命令安装 `tianshu@jeffusion`。不要删除整个天枢数据目录，不运行旧版的安装命令；新的诊断不会读取旧安装状态。旧 releases/、marketplace/、installation.json、operation.json 与 lifecycle.lock 不再使用；确认旧安装已退出后可单独清理，保留 config.json、data/ 及用户证据。
 
-```sh
-tianshu uninstall
-npm uninstall -g @jeffusion/tianshu
-```
+## 发布（维护者）
 
-卸载移除本工具管理的 Codex 插件和市场，保留配置、台账、验收记录及恢复文件。不要只删除 npm 包就认为 Codex 插件已卸载；其运行文件独立保存。工具不提供自动清空用户台账的选项。
+日常测试不递增版本。正式 npm 版本不可覆盖，因此本次修正发布为 `0.1.1`，不覆盖 `0.1.0`。
 
-## 发布流程（维护者）
+1. 同步 package.json、锁文件与 `.agents/plugins/marketplace.json` 的版本，PR 审查与 Linux/macOS CI 通过后合入 main。
+2. `npm run check` 验证实际 tarball 的文件边界、无源码依赖、无安装脚本、配置路由、MCP/页面资源和数据保全。`npm run test:native -- --local` 验证真实 Codex 宿主发现工具。
+3. 明确触发 `publish.yml`，输入版本；工作流构建 `dist/package`，打包该目录，经 `npm` 环境审批使用 OIDC 发布到 npmjs，并附来源证明。工程根包为 private，防止误发开发工程。
+4. 发布后运行 `npm run test:native`，验证真实 Codex 从 npmjs 安装、宿主加载四个 MCP 工具、doctor、卸载及台账保全；该测试仅使用临时 CODEX_HOME 和临时业务数据。
+5. 当前桌面客户端另验页面和“带到聊天”；命令行或 MCP 成功不能代替此项。
 
-日常本地测试不递增版本。正式 npm 版本不可覆盖；0.1.0 发布后，下一次正式发布须明确选择新版本。
-
-1. 功能通过 PR、独立审查和 Linux/macOS CI 合入 main。
-2. 检查包名、版本、文件白名单、第三方许可证和实际 npm 安装回归。
-3. 维护者明确触发 `.github/workflows/publish.yml`，输入 package.json 的版本。
-4. 工作流检查当前版本尚未发布，完整检查后构建 npm 包，通过 OIDC 发布到 npmjs，附带来源证明。
-5. 从 npm registry 全新安装，验证 `--version`、安装/doctor及用户数据保全。
-
-可信发布绑定：GitHub `jeffusion/tianshu`、工作流 `publish.yml`、环境 `npm`，允许 `npm publish`。环境应由维护者审批。首次发布可以在已登录且拥有 @jeffusion 组织权限的终端发布已检验的 npm 包；如 npm 要求交互验证，由维护者在自己的浏览器完成，不在聊天中传递验证码或 token。后续优先使用 OIDC，不在仓库保存长期 npm token。
-
-CI 的包测试在隔离前缀真实执行 `npm install`，使用 Codex fixture 验证失败恢复、升级、回滚、卸载和任务数据库字节保全。正式发布前另用真实 Codex CLI 的隔离配置验证；这两项都不能代替真实宿主 UI 验收。
+可信发布绑定 GitHub `jeffusion/tianshu`、`publish.yml`、`npm` 环境。不要保存长期 npm token，也不要在聊天发送验证码。发布前的本地原生安装验收不等于 npmjs 安装已验收。

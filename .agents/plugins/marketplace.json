@@ -1,0 +1,17 @@
+{
+  "name": "jeffusion",
+  "interface": { "displayName": "天枢" },
+  "plugins": [
+    {
+      "name": "tianshu",
+      "source": {
+        "source": "npm",
+        "package": "@jeffusion/tianshu",
+        "version": "0.1.1",
+        "registry": "https://registry.npmjs.org"
+      },
+      "policy": { "installation": "AVAILABLE", "authentication": "ON_INSTALL" },
+      "category": "Productivity"
+    }
+  ]
+}

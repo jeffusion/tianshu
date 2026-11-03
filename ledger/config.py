@@ -2,16 +2,16 @@
 import json
 import os
 import re
+import sys
 from pathlib import Path
 
 
 def config_path(value=None):
     selected=value or os.environ.get('TIANSHU_CONFIG')
-    location=Path(__file__).resolve().parents[1]/'runtime-config.json'
-    if not selected and location.is_file():
-        selected=json.loads(location.read_text(encoding='utf-8'))['config_path']
-    path=Path(selected or
-              Path.home()/'Library/Application Support/Tianshu/config.json').expanduser()
+    home=os.environ.get('TIANSHU_HOME') or (
+        Path.home()/'Library/Application Support/Tianshu' if sys.platform=='darwin'
+        else Path(os.environ.get('XDG_DATA_HOME') or Path.home()/'.local/share')/'tianshu')
+    path=Path(selected) if selected else Path(os.path.normpath(str(Path(home)/'config.json')))
     if not path.is_absolute():
         raise ValueError('配置路径必须为绝对路径')
     return path

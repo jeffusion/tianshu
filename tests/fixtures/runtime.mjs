@@ -6,7 +6,7 @@ import {Client} from '@modelcontextprotocol/sdk/client/index.js';
 import {StdioClientTransport} from '@modelcontextprotocol/sdk/client/stdio.js';
 export function runtime(){
   const root=mkdtempSync(join(tmpdir(),'tianshu-test-'));
-  cpSync('dist/plugin',root,{recursive:true});
+  cpSync('dist/package',root,{recursive:true});
   const db=join(root,'fixture.db'),config=join(root,'config.json');
   const cli=(command,data)=>JSON.parse(execFileSync('python3',[join(root,'ledger/coordinator.py'),'--db',db,command,...(data?['--input','-']:[])],{input:data?JSON.stringify(data):undefined,encoding:'utf8'})).result;
   cli('init');

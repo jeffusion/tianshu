@@ -1,0 +1,3 @@
+interface:
+  display_name: "天枢协调"
+  short_description: "按用户授权协调执行聊天、持续跟进任务进度并独立核验交付结果"

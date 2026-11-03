@@ -1,0 +1,5 @@
+{
+  "--color-background-primary": "rgb(255, 255, 255)",
+  "--color-background-secondary": "rgba(255, 255, 255, 0.96)",
+  "--color-background-tertiary": "rgb(246, 246, 246)"
+}

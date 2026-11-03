@@ -1,0 +1,63 @@
+{
+  "name": "tianshu",
+  "version": "0.1.0",
+  "private": true,
+  "type": "module",
+  "scripts": {
+    "dev": "node scripts/dev.mjs",
+    "check": "npm run build && npm test && npm run test:ledger",
+    "build": "npm run typecheck && node scripts/build.mjs",
+    "test": "node --test tests/*.test.mjs",
+    "test:ledger": "python3 -m unittest discover -s tests -p 'test_*.py'",
+    "typecheck": "tsc --noEmit",
+    "sync:local": "node scripts/sync-local.mjs",
+    "demo": "node scripts/demo.mjs",
+    "demo:prepare": "node scripts/demo.mjs --prepare-only",
+    "demo:check": "node scripts/check-demo.mjs"
+  },
+  "dependencies": {
+    "@modelcontextprotocol/ext-apps": "1.7.5",
+    "@modelcontextprotocol/sdk": "1.32.2",
+    "@openai/mcp-extensions": "0.2.1",
+    "@radix-ui/react-accordion": "1.3.1",
+    "@radix-ui/react-select": "2.4.1",
+    "@radix-ui/react-tooltip": "1.4.1",
+    "esbuild": "0.28.2",
+    "lucide-react": "1.66.0",
+    "react": "19.3.1",
+    "react-dom": "19.3.1",
+    "zod": "4.6.7"
+  },
+  "overrides": {
+    "zod": "$zod"
+  },
+  "devDependencies": {
+    "@types/node": "26.6.6",
+    "@types/react": "19.3.0",
+    "@types/react-dom": "19.3.0",
+    "@vitejs/plugin-react": "6.1.2",
+    "typescript": "7.0.2",
+    "vite": "8.3.5",
+    "vite-plugin-singlefile": "2.3.4"
+  },
+  "description": "天枢：面向长期目标的智能协作工作台",
+  "license": "MIT",
+  "author": "Jeffusion",
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/jeffusion/tianshu.git"
+  },
+  "homepage": "https://github.com/jeffusion/tianshu#readme",
+  "bugs": {
+    "url": "https://github.com/jeffusion/tianshu/issues"
+  },
+  "engines": {
+    "node": ">=24 <27"
+  },
+  "keywords": [
+    "codex",
+    "mcp",
+    "agent",
+    "task-coordination"
+  ]
+}

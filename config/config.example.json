@@ -1,0 +1,4 @@
+{
+  "sources": [{"id":"daily","label":"日常任务","path":"/absolute/path/to/coordinator.db"}],
+  "presentation_path":"/absolute/path/to/presentation.json"
+}
